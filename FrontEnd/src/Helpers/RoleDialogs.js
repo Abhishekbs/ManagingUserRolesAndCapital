@@ -23,25 +23,25 @@ const styles = {
 
 const permissionCheckList = [
     {
-        value:"addCountryOnly",
-        text:"Add countries Only"    
+        value: 'addRoleOnly',
+        text: "Can Add and Manipulate Role Only"
     },
     {
-        value:"addCapitalOnly",
-        text:"Add Capital Only"    
+        value: 'addUserOnly',
+        text: "Can Add and Manipulate User Only"
     },
     {
-        value:"editCreatedCountryOnly",
-        text:"Edit added country only" 
+        value: "addCountryOnly",
+        text: "Add Countries and Capital Only"
     },
     {
-        value:"editCapitalCountryOnly",
-        text: "Edit added capitals only" 
+        value: "editCreatedCountryOnly",
+        text: "Edit added Country and Capital only"
     },
     {
-        value:"viewCountryList",
-        text: "Only view these list"   
-    }   
+        value: "viewCountryList",
+        text: "Only view these list"
+    }
 ]
 
 class DialogsPopup extends React.Component {
@@ -102,13 +102,13 @@ class DialogsPopup extends React.Component {
         const { classes, onClose, selectedRole, roleOperation, action, ...other } = this.props;
         return (
             <Dialog onClose={this.handleClose} aria-labelledby="simple-dialog-title" {...other}>
-                <DialogTitle id="simple-dialog-title">User</DialogTitle>
+                <DialogTitle id="simple-dialog-title">Role</DialogTitle>
                 <div className={classes.container}>
                     <Grid container spacing={24}>
                         <Grid item xs={12}>
                             <FormControl className={classes.formControl}>
                                 <InputLabel htmlFor="component-simple">Role</InputLabel>
-                                <Input id="component-simple" value={selectedRole.role} onChange={(e) => this.handleChange(e, "role")} />
+                                <Input id="component-simple" disabled={this.props.action === "edit"} value={selectedRole.role} onChange={(e) => this.handleChange(e, "role")} />
                             </FormControl>
                         </Grid>
 

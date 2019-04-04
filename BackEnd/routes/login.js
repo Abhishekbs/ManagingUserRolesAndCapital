@@ -26,19 +26,18 @@ router.post("/", function (req, res) {
             let collection1 = db.get().collection('role');
             let permission = {
                 addCountryOnly: false,
-                addCapitalOnly: false,
                 editCreatedCountryOnly: false,
-                editCapitalCountryOnly: false,
-                viewCountryList: false
+                viewCountryList: false,
+                addRoleOnly: false,
+                addUserOnly: false
             };
-            
-            console.log(user.role);
+
             collection1.findOne({ role: user.role[0] }, function (err, role) {
                 if (err) {
                     res.json({ success: false, message: 'error in accessing role permission' });
                 }
                 rolePermission = role.permission;
-                Object.keys(permission).map((item)=>{
+                Object.keys(permission).map((item) => {
                     permission[item] = rolePermission.indexOf(item) > -1 ? true : false;
                 })
                 res.json({ success: true, data: { token, permission } });

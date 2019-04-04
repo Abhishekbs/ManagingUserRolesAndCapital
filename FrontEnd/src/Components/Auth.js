@@ -6,7 +6,8 @@ class Auth {
     login(data,cb){
         localStorage.setItem("isLoggedIn",true);
         localStorage.setItem("token",data.token);
-        localStorage.setItem("permission",data.permission);
+        localStorage.setItem("permission",JSON.stringify(data.permission));
+        localStorage.setItem("role",data.role);
         // this.authenticated = true;
         cb();
     }
@@ -14,7 +15,6 @@ class Auth {
 
     logout(cb){
         localStorage.clear();
-        cb();
     }
 
     isAuthenticated(){

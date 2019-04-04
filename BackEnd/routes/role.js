@@ -38,7 +38,7 @@ router.post("/addRole",middleware.checkToken, function (req, res) {
     })
 });
 
-router.post("/deleterole", middleware.checkToken,function (req, res) {
+router.post("/deleteRole", middleware.checkToken,function (req, res) {
     // res.send("Delete role")
     console.log(req.body);
     const data = req.body;
@@ -51,7 +51,6 @@ router.post("/deleterole", middleware.checkToken,function (req, res) {
             if (err) {
                 res.json({ success: false, message: 'erron in fetching Details' });
             }
-
             res.json({ success: true, data: docs, message: "deleted Successfully" });
             // db.close()
         })
@@ -59,12 +58,13 @@ router.post("/deleterole", middleware.checkToken,function (req, res) {
     });
 });
 
-router.post("/updaterole",middleware.checkToken, function (req, res) {
+router.post("/updateRole",middleware.checkToken, function (req, res) {
     // res.send("Edit role")
     const data = req.body;
+    console.log(data);
     var collection = db.get().collection('role');
-    var newvalues = { $set: { role: data.role} };
-    collection.updateOne({ role: data.old_role }, newvalues, function (err, obj) {
+    var newvalues = { $set: { permission:[...data.permission]} };
+    collection.updateOne({ role: data.role }, newvalues, function (err, obj) {
         if (err) {
             res.json({ success: false, message: 'erron in fetching Details' });
         }
@@ -82,7 +82,7 @@ router.post("/updaterole",middleware.checkToken, function (req, res) {
     })
 });
 
-router.get("/getrole",middleware.checkToken, function (req, res) {
+router.get("/getRole",middleware.checkToken, function (req, res) {
     // res.send("Get role");
     var collection = db.get().collection('role');
     collection.find({}).toArray(function (err, docs) {

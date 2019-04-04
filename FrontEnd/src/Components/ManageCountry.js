@@ -1,5 +1,6 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
+import MenuBar from './MenuBar';
 import { withStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 // import CardActions from '@material-ui/core/CardActions';
@@ -12,10 +13,7 @@ import DialogsPopup from '../Helpers/CountryDialogs';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
 // axios.defaults.baseURL = base_url === '' ? window.location.pathname : base_url;
-axios.defaults.headers.common['authorization'] = 'Bearer '+localStorage.getItem('token');
-axios.defaults.headers.common['X-CUSTOM_HEADER'] = 'CUSTOMER PORTAL';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'http://localhost:3005';
+import api from './apicall';
 
 const configUrl = "http://localhost:3005";
 
@@ -51,22 +49,30 @@ class ManageCountry extends React.Component {
             },
             action: null,
             countryList: [],
-            permission: localStorage.getItem("permission")
+            permission: JSON.parse(localStorage.getItem("permission"))
         }
     }
 
     componentDidMount() {
         //call api to get all country list
-        let self = this;
-        axios.get(configUrl + '/country/getCountry')
-            .then(function (response) {
-                self.setState({
-                    countryList: response.data.data
-                })
+
+        api.getCountry().then((response) => {
+            this.setState({
+                countryList: response.data.data
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+        });
+
+        
+
+        // axios.get(configUrl + '/country/getCountry')
+        //     .then((response) => {
+        //         this.setState({
+        //             countryList: response.data.data
+        //         })
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
     }
 
     handleClose = () => {
@@ -81,7 +87,7 @@ class ManageCountry extends React.Component {
     };
 
     handleClickOpen = (action, data) => {
-        
+
         if (data === undefined) {
             data = {
                 countryName: null,
@@ -106,73 +112,105 @@ class ManageCountry extends React.Component {
     }
 
     handleDeleteCountry = (data) => {
-        axios.post(configUrl + '/country/deleteCountry', data)
-            .then((response) => {
-                this.setState({
-                    countryList: [...response.data.data]
-                })
+
+
+        api.deleteCountry(data).then((response) => {
+            this.setState({
+                countryList: [...response.data.data]
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+        });
+
+
+        // axios.post(configUrl + '/country/deleteCountry', data)
+        //     .then((response) => {
+        //         this.setState({
+        //             countryList: [...response.data.data]
+        //         })
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
     }
 
     countryOperation = (action) => {
         let data = this.state.selectedCountry;
-        if (action == 'create') {
+        if (action === 'create') {
             // create New One
             // post call
-            axios.post(configUrl + '/country/addCountry', data)
-                .then((response) => {
-                    this.setState({
-                        countryList: [...response.data.data],
+
+            api.addCountry(data).then((response) => {
+                this.setState({
+                    countryList: [...response.data.data],
                         open: false
-                    })
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            });
+
+
+            // axios.post(configUrl + '/country/addCountry', data)
+            //     .then((response) => {
+            //         this.setState({
+            //             countryList: [...response.data.data],
+            //             open: false
+            //         })
+            //     })
+            //     .catch(function (error) {
+            //         console.log(error);
+            //     });
 
         } else {
             // update Existing
             // put call
-            axios.post(configUrl + '/country/updateCountry', data)
-                .then((response) => {
-                    this.setState({
-                        countryList: [...response.data.data],
-                        open:false
-                    })
+
+            api.updateCountry(data).then((response) => {
+                this.setState({
+                    countryList: [...response.data.data],
+                        open: false
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            });
+
+            
+            // axios.post(configUrl + '/country/updateCountry', data)
+            //     .then((response) => {
+            //         this.setState({
+            //             countryList: [...response.data.data],
+            //             open: false
+            //         })
+            //     })
+            //     .catch(function (error) {
+            //         console.log(error);
+            //     });
         }
 
     }
 
     render() {
-        const { classes } = this.props;
-        const ary = ['1', '2', '3', '4'];
+        const { classes, history } = this.props;
         const { countryList, permission } = this.state;
         console.log("managecountry");
         return (
             <div className={classes.root}>
                 <Grid container spacing={24}>
                     <Grid item xs={12}>
-                        <Button variant="contained" color="primary" className={classes.button}
-                            onClick={() => this.handleClickOpen('create')} >
-                            Add Country
-                        </Button>
-                        {this.state.action &&
-                            <DialogsPopup
-                                selectedCountry={this.state.selectedCountry}
-                                open={this.state.open}
-                                onClose={this.handleClose}
-                                action={this.state.action}
-                                countryOperation={this.countryOperation}
-                                changeSelectedValue={this.changeSelectedValue}
-                                permission={permission}
-                            />
+                        {
+                            permission.addCountryOnly ?
+                            <div>
+                                <Button variant="contained" color="primary" className={classes.button}
+                                    onClick={() => this.handleClickOpen('create')} >
+                                    Add Country
+                                </Button>
+                                {this.state.action &&
+                                    <DialogsPopup
+                                        selectedCountry={this.state.selectedCountry}
+                                        open={this.state.open}
+                                        onClose={this.handleClose}
+                                        action={this.state.action}
+                                        countryOperation={this.countryOperation}
+                                        changeSelectedValue={this.changeSelectedValue}
+                                    />
+                                }
+                            </div>
+                            :
+                            <div>Dont have permission to add Country</div>
                         }
                     </Grid>
                     {
@@ -186,21 +224,25 @@ class ManageCountry extends React.Component {
                                         <Typography component="p">
                                             Capital : {element.capital}
                                         </Typography>
-                                        <IconButton
-                                            aria-label="More"
-                                            aria-haspopup="true"
-                                            onClick={this.handleClick}
-                                        >
-                                            <Edit onClick={() => this.handleClickOpen('edit', element)} />
-                                        </IconButton>
 
-                                        <IconButton
-                                            aria-label="More"
-                                            aria-haspopup="true"
-                                            onClick={this.handleClick}
-                                        >
-                                            <Delete onClick={() => this.handleDeleteCountry(element)} />
-                                        </IconButton>
+                                        {permission.editCreatedCountryOnly && <div>
+                                            <IconButton
+                                                aria-label="More"
+                                                aria-haspopup="true"
+                                                onClick={this.handleClick}
+                                            >
+                                                <Edit onClick={() => this.handleClickOpen('edit', element)} />
+                                            </IconButton>
+
+                                            <IconButton
+                                                aria-label="More"
+                                                aria-haspopup="true"
+                                                onClick={this.handleClick}
+                                            >
+                                                <Delete onClick={() => this.handleDeleteCountry(element)} />
+                                            </IconButton>
+                                        </div>
+                                        }
                                     </CardContent>
                                 </Card>
                             </Grid>

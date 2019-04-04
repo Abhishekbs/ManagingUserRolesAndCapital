@@ -11,7 +11,6 @@ import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
 import Select from '@material-ui/core/Select';
 
-const emails = ['Karnataka', 'Maharastra'];
 const styles = {
     avatar: {
         backgroundColor: blue[100],
@@ -68,14 +67,14 @@ class DialogsPopup extends React.Component {
                         </Grid>
                         <Grid item xs={12}>
                             <FormControl className={classes.formControl}>
-                                <InputLabel htmlFor="age-simple">Age</InputLabel>
+                                <InputLabel htmlFor="age-simple">Role</InputLabel>
                                 <Select
                                     multiple
                                     value={selectedUser.role}
                                     onChange={(e) => this.handleChange(e, "role")}
                                     inputProps={{
-                                        name: 'age',
-                                        id: 'age-simple',
+                                        name: 'Role',
+                                        id: 'role-simple',
                                     }}
                                 >
                                     {
@@ -88,7 +87,7 @@ class DialogsPopup extends React.Component {
                         </Grid>
                         <Grid item xs={12}>
                             <Button variant="contained" color="primary" className={classes.button} onClick={this.handleUser}>
-                                {action == "create" ? "Add" : "Update"}
+                                {action === "create" ? "Add" : "Update"}
                             </Button>
                         </Grid>
                     </Grid>

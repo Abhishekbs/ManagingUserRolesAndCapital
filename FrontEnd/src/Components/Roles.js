@@ -13,11 +13,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Edit from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
 import axios from 'axios';
-axios.defaults.headers.common['X-CUSTOM_HEADER'] = 'CUSTOMER PORTAL';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'http://localhost:3005';
-axios.defaults.headers.common['authorization'] = 'Bearer '+localStorage.getItem('token');
-const configUrl = "http://localhost:3005";
+import api from './apicall';
+const configUrl = "http://localhost:3005/"
 
 
 const styles = theme => ({
@@ -39,20 +36,6 @@ const styles = theme => ({
     }
 });
 
-// let id = 0;
-// function createData(name, calories, fat, carbs, protein) {
-//     id += 1;
-//     return { id, name, calories, fat, carbs, protein };
-// }
-
-// const rows = [
-//     createData('Frozen yoghurt', 159),
-//     createData('Ice cream sandwich', 237),
-//     createData('Eclair', 262),
-//     createData('Cupcake', 305),
-//     createData('Gingerbread', 3569),
-// ];
-
 
 class ManageRole extends React.Component {
     constructor(props) {
@@ -61,7 +44,7 @@ class ManageRole extends React.Component {
             open: false,
             selectedRole: {
                 role: null,
-                permission:[]
+                permission: []
             },
             action: null,
             roleList: []
@@ -72,16 +55,24 @@ class ManageRole extends React.Component {
 
     componentDidMount() {
         //call api to get all user list
-        let self = this;
-        axios.get(configUrl + '/role/getRole')
-            .then(function (response) {
-                self.setState({
-                    roleList: response.data.data
-                })
+
+
+        api.getRole().then((response1) => {
+            this.setState({
+                roleList: response1.data.data
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+        });
+
+        // let self = this;
+        // axios.get(configUrl + '/role/getRole')
+        //     .then(function (response) {
+        //         self.setState({
+        //             roleList: response.data.data
+        //         })
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
     }
 
     handleClose = () => {
@@ -98,7 +89,7 @@ class ManageRole extends React.Component {
         if (data === undefined) {
             data = {
                 role: null,
-                permission:[]
+                permission: []
             }
         }
         this.setState({
@@ -118,15 +109,11 @@ class ManageRole extends React.Component {
     }
 
     handleDeleteUser = (data) => {
-        axios.post(configUrl + '/role/deleteRole', data)
-            .then((response) => {
-                this.setState({
-                    roleList: [...response.data.data]
-                })
+        api.deleteRole(data).then((response1) => {
+            this.setState({
+                roleList: [...response1.data.data]
             })
-            .catch(function (error) {
-                console.log(error);
-            });
+        });
     }
 
     roleOperation = (action) => {
@@ -134,30 +121,25 @@ class ManageRole extends React.Component {
         if (action == 'create') {
             // create New One
             // post call
-            axios.post(configUrl + '/role/addRole', data)
-                .then((response) => {
-                    this.setState({
-                        roleList: [...response.data.data],
-                        open: false
-                    })
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
 
+            api.addRole(data).then((response1) => {
+                this.setState({
+                    roleList: response1.data.data,
+                    open: false
+                })
+            });
+
+ 
         } else {
             // update Existing
             // put call
-            axios.post(configUrl + '/role/updateRole', data)
-                .then((response) => {
-                    this.setState({
-                        roleList: [...response.data.data],
-                        open: false
-                    })
+
+            api.updateRole(data).then((response1) => {
+                this.setState({
+                    roleList: response1.data.data,
+                    open: false
                 })
-                .catch(function (error) {
-                    console.log(error);
-                });
+            });
         }
 
     }
@@ -194,9 +176,16 @@ class ManageRole extends React.Component {
                                 <TableBody>
                                     {roleList.map(row => (
                                         <TableRow key={row.id}>
-                                            
                                             <TableCell align="right">{row.role}</TableCell>
-                                            <TableCell align="right">                                               
+                                            <TableCell align="right">
+
+                                                <IconButton
+                                                    aria-label="More"
+                                                    aria-haspopup="true"
+                                                    onClick={this.handleClick}
+                                                >
+                                                    <Edit onClick={() => this.handleClickOpen('edit', row)} />
+                                                </IconButton>
                                                 <IconButton
                                                     aria-label="More"
                                                     aria-haspopup="true"
@@ -204,6 +193,7 @@ class ManageRole extends React.Component {
                                                 >
                                                     <Delete onClick={() => this.handleDeleteUser(row)} />
                                                 </IconButton>
+
                                             </TableCell>
                                         </TableRow>
                                     ))}

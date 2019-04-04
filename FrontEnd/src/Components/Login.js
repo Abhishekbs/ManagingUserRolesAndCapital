@@ -9,9 +9,7 @@ import Paper from '@material-ui/core/Paper';
 // import { MuiPickersUtilsProvider, TimePicker, DatePicker } from 'material-ui-pickers';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
-axios.defaults.headers.common['X-CUSTOM_HEADER'] = 'CUSTOMER PORTAL';
-axios.defaults.headers.post['Content-Type'] = 'application/json';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = 'http://localhost:3005';
+
 
 const configUrl = "http://localhost:3005";
 const styles = theme => ({
@@ -55,6 +53,11 @@ class Login extends Component {
                 if (response.data.success) {
                     Auth.login(response.data.data, () => {
                         this.props.history.push("/")
+                        //     if(response.data.data.role !== 'admin'){
+                        // }
+                        // else{
+                        //     this.props.history.push("/manageuser")
+                        // }
                     })
                 }
                 else {

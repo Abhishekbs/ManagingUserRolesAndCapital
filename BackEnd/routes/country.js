@@ -3,7 +3,8 @@ var router = express.Router();
 var country = require("../service/country");
 var db = require('../dbCreator');
 let middleware = require('./tokenMiddleware');
-
+let config = require('./config');
+let jwt = require('jsonwebtoken');
 // router.get("/", function(req,res){
 //     res.send("server running");
 // })
@@ -16,9 +17,15 @@ let middleware = require('./tokenMiddleware');
 
 
 
-router.post("/addCountry",middleware.checkToken, function (req, res) {
+router.post("/addCountry", middleware.checkToken, function (req, res) {
     // ("Adding country") 
-    const data = req.body;
+    console.log(req.headers);
+    var decoded = jwt.verify(req.headers["authorization"].split(" ")[1], config.secret);
+    const data = {
+        ...req.body,
+        owner: decoded.username
+    }
+
     console.log("data==>", data);
     let result = country.addcountry(data);
     var collection = db.get().collection('country');
@@ -37,7 +44,7 @@ router.post("/addCountry",middleware.checkToken, function (req, res) {
                         res.json({ success: false, message: 'erron in fetching Details' });
                     }
 
-                    res.json({ success: true, data: docs});
+                    res.json({ success: true, data: docs });
                     // db.close()
                 })
             })
@@ -48,7 +55,7 @@ router.post("/addCountry",middleware.checkToken, function (req, res) {
     })
 });
 
-router.post("/deleteCountry",middleware.checkToken, function (req, res) {
+router.post("/deleteCountry", middleware.checkToken, function (req, res) {
     // res.send("Delete Roles")
     console.log(req.body);
     const data = req.body;
@@ -69,7 +76,7 @@ router.post("/deleteCountry",middleware.checkToken, function (req, res) {
     });
 });
 
-router.post("/updateCountry",middleware.checkToken, function (req, res) {
+router.post("/updateCountry", middleware.checkToken, function (req, res) {
     // res.send("Edit Roles")
     const data = req.body;
     var collection = db.get().collection('country');
@@ -84,14 +91,14 @@ router.post("/updateCountry",middleware.checkToken, function (req, res) {
                 res.json({ success: false, message: 'erron in fetching Details' });
             }
 
-             res.json({ success: true, data: docs });
+            res.json({ success: true, data: docs });
             // db.close()
         })
 
     })
 });
 
-router.get("/getCountry",middleware.checkToken, function (req, res) {
+router.get("/getCountry", middleware.checkToken, function (req, res) {
     // res.send("Get Roles");
     var collection = db.get().collection('country');
     collection.find({}).toArray(function (err, docs) {
